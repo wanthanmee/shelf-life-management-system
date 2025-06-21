@@ -153,7 +153,7 @@ class LoginPage(CTkFrame):
 
                 subprocess.Popen([
                     sys.executable,
-                    "main_test3.py",
+                    "product-owner/main_test3.py",
                     name,             # name first
                     p_email,          # email second
                     str(owner_id)     # owner_id last
