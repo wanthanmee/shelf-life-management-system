@@ -7,6 +7,9 @@ from tkinter import ttk
 import sqlite3
 import openpyxl
 from fpdf import FPDF  # pip install fpdf
+from customtkinter import CTkImage
+from PIL import Image
+import os
 
 '''
 Additional Features: 
@@ -249,7 +252,7 @@ class ProductListPage(CTkFrame):
     def open_detail_popup(self, data):
         detail_popup = CTkToplevel(self)
         detail_popup.title("Product Details")
-        detail_popup.geometry("600x400")
+        detail_popup.geometry("600x600")
 
         fields = ["Product Name", "Description", "Testing Date", "Maturity Date"]
         entries = {}
@@ -257,7 +260,7 @@ class ProductListPage(CTkFrame):
         for i, label in enumerate(fields):
             CTkLabel(detail_popup, text=label).pack()
             entry = CTkEntry(detail_popup)
-            entry.insert(0, data[i+1])  # Skip Batch_ID at data[0]
+            entry.insert(0, data[i + 1]) 
             entry.pack()
             entries[label] = entry
         '''
@@ -311,6 +314,44 @@ class ProductListPage(CTkFrame):
             self.load_data()
 
         CTkButton(detail_popup, text="Save Changes", command=save_changes).pack(pady=10)
+
+        barcode_path = None
+
+        try:
+            conn = sqlite3.connect("ProductRegistration.db")
+            cursor = conn.cursor()
+            cursor.execute("SELECT barcode_path FROM products WHERE batch_id = ?", (data[0],))
+            result = cursor.fetchone()
+            conn.close()
+
+            if result and result[0]:
+                barcode_path = result[0].strip()
+
+        except Exception as e:
+            print("❌ Error retrieving barcode path from database:", e)
+
+        if barcode_path and os.path.exists(barcode_path):
+            try:
+                image = Image.open(barcode_path)
+                max_width = 300
+                ratio = max_width / image.width
+                new_size = (max_width, int(image.height * ratio))
+                image = image.resize(new_size, Image.Resampling.LANCZOS)
+
+                barcode_photo = CTkImage(light_image=image, size=new_size)
+
+                barcode_frame = CTkFrame(detail_popup)
+                barcode_frame.pack(pady=20)
+
+                barcode_label = CTkLabel(barcode_frame, image=barcode_photo, text="")
+                barcode_label.image = barcode_photo  # Prevent garbage collection
+                barcode_label.pack(pady=10)
+
+            except Exception as e:
+                print(f"❌ Error displaying barcode: {e}")
+        else:
+            print("⚠️ barcode_path is missing or file not found.")
+            CTkLabel(detail_popup, text="Barcode image not found.", text_color="gray").pack(pady=10)
     '''
     =====================================================================================================
     Function: def export_to_excel(self)
