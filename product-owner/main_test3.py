@@ -384,19 +384,19 @@ class App(ctk.CTk):
     =====================================================================================================
     '''
     def create_frames(self):
-        # Create and pack page frames inside the container; hide all until shown.
+
         self.frames = {}
+        
         for F in (PO_Home, ProductRegistration, ProductListPage):
             page_name = F.__name__
 
-            if F == ProductRegistration or F == ProductListPage:
-                frame = F(parent=self.container, controller=self, owner_id=self.owner_id)
-            else:
-                frame = F(parent=self.container, controller=self)
+            # Pass owner_id to all frames
+            frame = F(parent=self.container, controller=self, owner_id=self.owner_id)
 
             frame.pack(fill="both", expand=True)
             frame.pack_forget()
             self.frames[page_name] = frame
+
     '''
     =====================================================================================================
     Function: def show_frame(self, page_name)
