@@ -135,7 +135,6 @@ class App(ctk.CTk):
             ("Home", self.home_icon, self.show_home),
             ("Product Registration", self.register_icon, self.show_register),
             ("Product List", self.list_icon, self.show_list),
-            ("Mailbox", self.mailbox_icon, self.show_mailbox),
         ]
 
         self.nav_buttons = []
@@ -188,14 +187,14 @@ class App(ctk.CTk):
             self.home_icon = ctk.CTkImage(light_image=Image.open(f"{base_path}SE home 1.jpeg"), size=(40, 40))
             self.register_icon = ctk.CTkImage(light_image=Image.open(f"{base_path}SE register.jpeg"), size=(40, 40))
             self.list_icon = ctk.CTkImage(light_image=Image.open(f"{base_path}SE list.jpeg"), size=(40, 40))
-            self.mailbox_icon = ctk.CTkImage(light_image=Image.open(f"{base_path}SE mail.jpeg"), size=(40, 40))
+
         except Exception as e:
             print(f"Error loading icons: {e}")
             # Fallback to None if files are not found
             self.home_icon = None
             self.register_icon = None
             self.list_icon = None
-            self.mailbox_icon = None
+
     '''
     =====================================================================================================
     Function: def create_circular_image(self, image_path, size)
@@ -431,9 +430,7 @@ class App(ctk.CTk):
     def show_list(self):
         self.show_frame("ProductListPage")
 
-    def show_mailbox(self):
-        messagebox.showinfo("Mailbox", "Mailbox functionality coming soon!")
-        print("Mailbox clicked")
+
 
 
 if __name__ == "__main__":
