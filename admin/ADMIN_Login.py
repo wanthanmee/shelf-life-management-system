@@ -82,7 +82,6 @@ class AdminLoginPage(ctk.CTkFrame):
         else:
             messagebox.showerror(title="Login Unsuccessful", message="Username or Password incorrect.")
 
-
 # Run the application
 if __name__ == "__main__":
     ctk.set_appearance_mode("light")
