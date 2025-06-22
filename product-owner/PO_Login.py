@@ -118,21 +118,29 @@ class LoginPage(CTkFrame):
 
         try:
             # Check if the email already exists
-            cursor.execute("SELECT owner_id, name, email FROM product_owners WHERE email=?", (p_email,))
+            cursor.execute("SELECT owner_id, name, email, status FROM product_owners WHERE email=?", (p_email,))
             result = cursor.fetchone()
 
             if result:
-                owner_id, owner_name, owner_email = result
-                messagebox.showinfo("Login Successful", f"Welcome back, {owner_name}!")
+                owner_id, owner_name, owner_email, status = result
 
-                subprocess.Popen([
-                    sys.executable,
-                    "product-owner/main_test3.py",
-                    owner_name,       # name first
-                    owner_email,      # email second
-                    str(owner_id)     # owner_id last
-                ])
-                self.master.destroy()
+                if status == "Approved":
+                    messagebox.showinfo("Login Successful", f"Welcome back, {owner_name}!")
+                    subprocess.Popen([
+                        sys.executable,
+                        "product-owner/main_test3.py",
+                        owner_name,
+                        owner_email,
+                        str(owner_id)
+                    ])
+                    self.master.destroy()
+
+                elif status == "Pending":
+                    messagebox.showwarning("Approval Pending", "Your registration is still pending admin approval.")
+                elif status == "Denied":
+                    messagebox.showerror("Access Denied", "Your registration has been denied by the admin.")
+                else:
+                    messagebox.showerror("Unknown Status", f"Your account has an unknown status: {status}")
 
             else:
                 # Register new user
@@ -145,20 +153,10 @@ class LoginPage(CTkFrame):
                 ''', (p_email, name, status, registered_at))
                 conn.commit()
 
-                # Retrieve the new owner's ID
-                cursor.execute("SELECT owner_id FROM product_owners WHERE email=?", (p_email,))
-                owner_id = cursor.fetchone()[0]
-
-                messagebox.showinfo("Registration Successful", "Product owner registered successfully. Waiting for admin approval.")
-
-                subprocess.Popen([
-                    sys.executable,
-                    "product-owner/main_test3.py",
-                    name,             # name first
-                    p_email,          # email second
-                    str(owner_id)     # owner_id last
-                ])
-                self.master.destroy()
+                messagebox.showinfo(
+                    "Registration Successful",
+                    "You have been registered successfully!\nPlease wait for admin approval before logging in."
+                )
 
         except sqlite3.IntegrityError:
             messagebox.showerror("Duplicate Error", "This email is already registered.")
@@ -167,7 +165,6 @@ class LoginPage(CTkFrame):
         finally:
             cursor.close()
             conn.close()
-
 
     def show_login(self):
         # Hide the product owner form and show the login form
